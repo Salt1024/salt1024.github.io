@@ -1,12 +1,16 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router'
-import { useCounterStore } from '@/stores/counter'
-
-const store = useCounterStore()
-
-store.count++
+<script lang="ts" setup>
+import { dateZhCN, NConfigProvider, zhCN } from 'naive-ui'
+import { themeOverrides } from '@/config'
 </script>
 
 <template>
-  <RouterView />
+  <n-config-provider
+    :date-locale="dateZhCN"
+    :locale="zhCN"
+    :theme-overrides="themeOverrides"
+    abstract
+    inline-theme-disabled
+  >
+    <router-view />
+  </n-config-provider>
 </template>

@@ -1,16 +1,39 @@
-import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { resolve } from 'path'
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+// https://vite.dev/config/
+export default defineConfig(() => {
+  return {
+    plugins: [
+      vue(),
+    ],
+    // base: mode === 'production' ? 'https://salt1024.github.io/' : '/',
+    server: {
+      host: '0.0.0.0',
+      // proxy: {
+      //   '/api': {
+      //     target: 'https://127.0.0.1:11434',
+      //     changeOrigin: true,
+      //     secure: false,
+      //   },
+      // },
+    },
+    resolve: {
+      alias: {
+        '@/': `${resolve(__dirname, 'src')}/`,
+      },
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          sanitizeFileName: (name) => {
+            return name
+              .replace(/\s+/g, '-') // Replaces spaces with dashes.
+              .replace(/[^a-zA-Z0-9_.-]/g, ''); // Removes all invalid characters.
+          },
+        }
+      }
     }
   }
 })

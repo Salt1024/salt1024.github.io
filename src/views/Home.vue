@@ -1,106 +1,137 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import { NDrawer, NIcon } from 'naive-ui'
+import { reactive, watch, markRaw } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { routes } from '@/router'
+import MenuOutline from '@vicons/ionicons5/MenuOutline'
 
+import type { Component } from 'vue'
+
+type MenuItem = {
+  label: string,
+  key: string,
+  icon: Component
+}
+
+type Menu = {
+  list: Array<MenuItem>,
+  active: string,
+  isExpanded: boolean,
+}
+
+const route = useRoute()
+const router = useRouter()
+const menu: Menu = reactive({
+  list: [],
+  active: '',
+  isExpanded: false,
+})
+
+menu.active = route.meta.key || route.meta.menuKey
+
+menu.list = routes[0].children.map(routeRaw => {
+  return {
+    label: routeRaw.meta.label,
+    key: routeRaw.name.toString(),
+    icon: markRaw(routeRaw.meta.icon),
+  }
+})
+
+function handleMenuClick (menuItem: MenuItem) {
+  menu.active = menuItem.key
+  router.push({
+    name: menuItem.key,
+  })
+  menu.isExpanded = false
+}
+
+watch(route, (newVal) => {
+  if (newVal?.meta?.menuKey) {
+    menu.active = newVal.meta.menuKey
+  } else if (newVal?.meta?.key) {
+    menu.active = newVal.meta.key
+  }
+})
 </script>
 
 <template>
-  <div id="home">
-    <header>
-      Salt1024's Blog
-    </header>
-    <main>
-      <div class="article-list">
-        <div class="article-item">
-          <div class="article-cover"></div>
-          <div class="article-info">
-            <div class="article-title">施工中</div>
-            <div class="article-description">施工中</div>
-            <div class="update-time">2024-04-23 23:59:59</div>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
+  <header>
+    <NIcon
+      :component="MenuOutline"
+      size="28"
+      style="cursor: pointer"
+      @click="menu.isExpanded = true"
+    />
+  </header>
+  <main>
+    <router-view></router-view>
+  </main>
+  <!--菜单-->
+  <NDrawer v-model:show="menu.isExpanded" placement="left">
+    <nav>
+      <div class="logo">Salt1024</div>
+      <ul class="menu">
+        <li
+          v-for="item of menu.list"
+          :key="item.key"
+          :class="{ 'menu-item-active': item.key === menu.active }"
+          class="menu-item"
+          @click="handleMenuClick(item)"
+        >
+          <NIcon :component="item.icon" class="menu-item-icon" size="24" />
+          <span>{{ item.label }}</span>
+        </li>
+      </ul>
+    </nav>
+  </NDrawer>
 </template>
 
 <style lang="scss" scoped>
-#home {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: auto;
+header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  padding: 0 12px;
+  background: #f5f5f5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
 
-  header {
-    position: relative;
-    width: 100%;
-    height: 60px;
-    flex: 0 0 60px;
-    background-color: rgba(200, 200, 200, 0.8);
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
+main {
+  height: calc(100vh - 84px);
+  margin-top: 24px;
+}
+
+nav {
+  .logo {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 50px;
+    height: 50px;
+    padding: 0 16px;
   }
 
-  main {
-    width: 100%;
-    flex: 1 1 auto;
-    height: 300px;
-    padding: 0 20px;
-  }
+  .menu {
+    margin: 0;
+    padding: 0 12px;
 
-  .article-list {
-    position: relative;
-    margin: 40px auto 0 auto;
-    max-width: 1200px;
-  }
+    li.menu-item {
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      list-style: none;
+      cursor: pointer;
+      user-select: none;
 
-  .article-item {
-    position: relative;
-    width: 100%;
-    height: 160px;
-    background-color: rgba(240, 240, 240, 1);
-    border-radius: 9px;
-    padding: 20px 40px;
-    display: flex;
-    cursor: pointer;
-
-    .article-cover {
-      width: 100px;
-      height: 100px;
-      flex: 0 0 100px;
-      border-radius: 9px;
+      .menu-item-icon {
+        margin-right: 8px;
+      }
     }
 
-    .article-info {
-      margin-left: 20px;
-      display: flex;
-      flex-direction: column;
-
-      .article-title {
-        font-size: 24px;
-        font-weight: bold;
-        height: 40px;
-        line-height: 40px;
-        flex: 0 0 40px;
-      }
-
-      .article-description {
-        font-size: 16px;
-        color: #333333;
-        height: 40px;
-        flex: 1 1 40px;
-      }
-
-      .update-time {
-        font-size: 16px;
-        color: #333333;
-        height: 24px;
-        line-height: 24px;
-        flex: 0 0 24px;
-      }
+    li.menu-item-active {
+      font-weight: 500;
+      background-color: rgba(0, 0, 0, 0.1);
     }
   }
 }
