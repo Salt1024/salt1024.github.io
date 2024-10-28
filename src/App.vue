@@ -1,12 +1,7 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router'
-import { useCounterStore } from '@/stores/counter'
+<script lang="ts" setup>
 
-const store = useCounterStore()
-
-store.count++
 </script>
 
 <template>
-  <RouterView />
+  <router-view />
 </template>

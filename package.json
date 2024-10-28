@@ -1,30 +1,20 @@
 {
-  "name": "salt1024-blog",
-  "author": "salt1024",
-  "version": "0.0.0",
+  "name": "rsbuild-project",
   "private": true,
-  "type": "module",
+  "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "type-check": "vue-tsc --build --force"
+    "dev": "rsbuild dev",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview"
   },
   "dependencies": {
-    "pinia": "^2.1.7",
-    "three": "^0.167.1",
-    "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "pinia": "^2.2.4",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.12.5",
-    "@types/three": "^0.167.1",
-    "@vitejs/plugin-vue": "^5.0.4",
-    "@vue/tsconfig": "^0.5.1",
-    "sass": "^1.75.0",
-    "typescript": "~5.4.0",
-    "vite": "^5.2.8",
-    "vue-tsc": "^2.0.11"
+    "@rsbuild/core": "^1.0.16",
+    "@rsbuild/plugin-vue": "^1.0.2",
+    "typescript": "^5.6.3"
   }
 }
