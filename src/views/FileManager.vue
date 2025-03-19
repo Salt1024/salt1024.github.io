@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { useFileDialog } from '@vueuse/core'
-import { NButton, NSpace, NIcon, NFloatButton } from 'naive-ui'
+import { NButton, NSpace, NFloatButton } from 'naive-ui'
 import { $message, $dialog } from '@/utils'
-import TrashOutline from '@vicons/ionicons5/TrashOutline'
 import { FileManager } from '@/utils'
+import type { FileObject } from '@/types'
 
 let fm: FileManager = new FileManager()
 const fileList = ref([])
@@ -23,7 +23,7 @@ onChange(async (files) => {
 
 function showExistFileTip (existFiles: Array<File>) {
   let fileNames = existFiles.map(file => file.name).join('\n')
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     $dialog.warning({
       title: '警告',
       closeOnEsc: false,
@@ -47,11 +47,6 @@ async function refreshFileList () {
   fileList.value = await fm.list()
 }
 
-async function readFile (handle: FileSystemFileHandle) {
-  const file = await handle.getFile()
-  console.log(file)
-}
-
 function addFile () {
   reset()
   open()
@@ -61,12 +56,14 @@ async function removeFile (handle: FileSystemFileHandle) {
   try {
     await fm.remove(handle)
     await refreshFileList()
-  } catch (e) {
+  } catch (e: any) {
     $message.error(e.message)
   }
 }
 
-async function downloadFile (item) {}
+async function downloadFile (item: FileObject) {
+  // todo
+}
 
 function formatSize (size: number) {
   if (size > 1024 * 1024) {

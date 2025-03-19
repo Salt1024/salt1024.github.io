@@ -1,3 +1,5 @@
+import type { FileObject } from '@/types'
+
 export class FileManager {
   opfs: FileSystemDirectoryHandle
 
@@ -40,7 +42,7 @@ export class FileManager {
     await this.opfs.removeEntry(handle.name, { recursive: true })
   }
 
-  async list (): Promise<Array<{ name: string, handle: FileSystemFileHandle }>> {
+  async list (): Promise<Array<FileObject>> {
     const fileList = []
     for await (let [name, handle] of this.opfs.entries()) {
       const file = await handle.getFile()
