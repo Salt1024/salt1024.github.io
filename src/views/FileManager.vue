@@ -19,7 +19,6 @@ onChange(async (files) => {
     }
   }
   await refreshFileList()
-  reset()
 })
 
 function showExistFileTip (existFiles: Array<File>) {
@@ -53,9 +52,14 @@ async function readFile (handle: FileSystemFileHandle) {
   console.log(file)
 }
 
-async function removeFile (item: { name: string, handle: FileSystemFileHandle }) {
+function addFile () {
+  reset()
+  open()
+}
+
+async function removeFile (handle: FileSystemFileHandle) {
   try {
-    await fm.remove(item.handle)
+    await fm.remove(handle)
     await refreshFileList()
   } catch (e) {
     $message.error(e.message)
@@ -63,6 +67,16 @@ async function removeFile (item: { name: string, handle: FileSystemFileHandle })
 }
 
 async function downloadFile (item) {}
+
+function formatSize (size: number) {
+  if (size > 1024 * 1024) {
+    return Math.round(size / 1024 / 1024 * 100) / 100 + 'MB'
+  } else if (size > 1024) {
+    return Math.round(size / 1024 * 100) / 100 + 'KB'
+  } else {
+    return size + 'B'
+  }
+}
 
 onMounted(async () => {
   await fm.init()
@@ -74,16 +88,15 @@ onMounted(async () => {
   <div class="file-list">
     <div v-for="item of fileList" class="file-item">
       <div class="file-name">{{ item.name }}</div>
-
       <NSpace align="center">
-        <NButton text type="error" @click="removeFile(item)">删除</NButton>
-        <NButton text type="primary" @click="readFile(item)">查看</NButton>
+        <span>{{ formatSize(item.size) }}</span>
+        <NButton text type="error" @click="removeFile(item.handle)">删除</NButton>
         <NButton text type="primary" @click="downloadFile(item)">下载</NButton>
       </NSpace>
     </div>
   </div>
 
-  <NFloatButton :bottom="20" :right="20" type="primary" @click="open()">+</NFloatButton>
+  <NFloatButton :bottom="20" :right="20" type="primary" @click="addFile">+</NFloatButton>
 </template>
 <style scoped>
 .file-list {

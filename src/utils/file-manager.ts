@@ -43,7 +43,8 @@ export class FileManager {
   async list (): Promise<Array<{ name: string, handle: FileSystemFileHandle }>> {
     const fileList = []
     for await (let [name, handle] of this.opfs.entries()) {
-      fileList.push({ name, handle })
+      const file = await handle.getFile()
+      fileList.push({ name, handle, size: file.size })
     }
     return fileList
   }
