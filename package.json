@@ -11,9 +11,11 @@
   "dependencies": {
     "@vicons/ionicons5": "^0.13.0",
     "@vueuse/core": "^12.4.0",
+    "gsap": "^3.12.7",
     "highlight.js": "^11.11.1",
     "marked": "^15.0.6",
     "marked-highlight": "^2.2.1",
+    "matter-js": "^0.20.0",
     "naive-ui": "^2.41.0",
     "ollama": "^0.5.12",
     "pinia": "^2.3.1",

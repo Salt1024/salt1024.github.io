@@ -1,157 +1,102 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { useFileDialog } from '@vueuse/core'
-import { NButton, NSpace } from 'naive-ui'
+import { NButton, NSpace, NIcon, NFloatButton } from 'naive-ui'
 import { $message, $dialog } from '@/utils'
+import TrashOutline from '@vicons/ionicons5/TrashOutline'
+import { FileManager } from '@/utils'
 
-const {
-  open,
-  onChange,
-} = useFileDialog()
+let fm: FileManager = new FileManager()
+const fileList = ref([])
+const { open, onChange } = useFileDialog()
 
 onChange(async (files) => {
-  for (let i = 0; i < files.length; i++) {
-    await saveFile(files[i])
+  const existFiles = await fm.save(files)
+  if (existFiles.length > 0) {
+    const isOverride = await showExistFileTip(existFiles)
+    if (isOverride) {
+      await fm.save(existFiles, true)
+    }
   }
+  await refreshFileList()
 })
 
-let opfs: FileSystemDirectoryHandle
-const fileList = ref([])
-
-function showExistFileTip (fileName: string) {
+function showExistFileTip (existFiles: Array<File>) {
+  let fileNames = existFiles.map(file => file.name).join('\n')
   return new Promise((resolve, reject) => {
     $dialog.warning({
       title: '警告',
       closeOnEsc: false,
       closable: false,
       maskClosable: false,
-      content: `已存在文件【${fileName}】，是否覆盖？`,
+      contentStyle: 'white-space: pre-wrap',
+      content: `已存在文件，是否覆盖？\n\n${fileNames}`,
       positiveText: '覆盖',
       negativeText: '跳过',
       onPositiveClick: () => {
         resolve(true)
       },
       onNegativeClick: () => {
-        reject(false)
+        resolve(false)
       },
     })
   })
 }
 
-async function saveFile (file: File) {
-  const handle = await opfs.getFileHandle(file.name, { create: true })
-  const nowFile = await handle.getFile()
-  try {
-    if (nowFile.size > 0) {
-      await showExistFileTip(file.name)
-    }
-    const stream = await handle.createWritable()
-    await stream.truncate(0)
-    await stream.write(await file.arrayBuffer())
-    await stream.close()
-    await showFile()
-  } catch (e) {
-    console.log('取消保存')
-  }
+async function refreshFileList () {
+  fileList.value = await fm.list()
 }
-
-async function showFile () {
-  try {
-    fileList.value = []
-    for await (let [name, handle] of opfs.entries()) {
-      fileList.value.push({ name, handle })
-    }
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      $message.error(error.message)
-    } else {
-      $message.error('An unknown error occurred')
-    }
-  }
-}
-
-const fileContent = ref('')
 
 async function readFile (handle: FileSystemFileHandle) {
   const file = await handle.getFile()
-  const stream = file.stream()
-  const reader = stream.getReader()
-  const decoder = new TextDecoder('utf-8')
-  fileContent.value = ''
-
-  const processText = ({ done, value }: ReadableStreamReadResult<Uint8Array<ArrayBufferLike>>): any => {
-    if (done) {
-      return
-    }
-    const str = decoder.decode(value)
-    fileContent.value += str
-    return reader.read().then(processText)
-  }
-
-  reader.read().then(processText)
+  console.log(file)
 }
 
-async function removeFile (handle: FileSystemFileHandle) {
+async function removeFile (item: { name: string, handle: FileSystemFileHandle }) {
   try {
-    await opfs.removeEntry(handle.name, { recursive: true })
-    await showFile()
-    $message.success('删除成功')
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      $message.error(error.message)
-    } else {
-      $message.error('An unknown error occurred')
-    }
+    await fm.remove(item.handle)
+    await refreshFileList()
+  } catch (e) {
+    $message.error(e.message)
   }
 }
+
+async function downloadFile (item) {}
 
 onMounted(async () => {
-  opfs = await navigator.storage.getDirectory()
-  await showFile()
+  await fm.init()
+  await refreshFileList()
 })
 </script>
 
 <template>
-  <header>
-    <NButton @click="open()" type="primary">添加文件</NButton>
-  </header>
-  <main>
-    <div class="file-list">
-      <div v-for="item of fileList" class="file-item">
-        <div class="file-name">{{ item.name }}</div>
-        <NSpace class="operate">
-          <NButton @click="readFile(item.handle)" type="primary">读取</NButton>
-          <NButton @click="removeFile(item.handle)" type="error">删除</NButton>
-        </NSpace>
-      </div>
-    </div>
-    <div class="file-preview">
-      {{ fileContent }}
-    </div>
-  </main>
+  <div class="file-list">
+    <div v-for="item of fileList" class="file-item">
+      <div class="file-name">{{ item.name }}</div>
 
+      <NSpace align="center">
+        <NButton text type="error" @click="removeFile(item)">删除</NButton>
+        <NButton text type="primary" @click="readFile(item)">查看</NButton>
+        <NButton text type="primary" @click="downloadFile(item)">查看</NButton>
+      </NSpace>
+    </div>
+  </div>
+
+  <NFloatButton :bottom="20" :right="20" type="primary" @click="open()">+</NFloatButton>
 </template>
 <style scoped>
-main {
-  display: flex;
-}
-
 .file-list {
-  width: 50%;
+  width: 100%;
 }
 
 .file-item {
   display: flex;
   align-items: center;
-  padding: 4px 10px;
+  height: 48px;
+  padding: 10px 12px;
 
   .file-name {
     flex: 1 1 auto;
   }
-}
-
-.file-preview {
-  width: 50%;
-  white-space: pre;
 }
 </style>

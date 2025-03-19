@@ -87,19 +87,20 @@ watch(route, (newVal) => {
 </template>
 
 <style lang="scss" scoped>
+$header_height: 60px;
+
 header {
   display: flex;
   align-items: center;
   width: 100%;
-  height: 60px;
+  height: $header_height;
   padding: 0 12px;
   background: #f5f5f5;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 main {
-  height: calc(100vh - 84px);
-  margin-top: 24px;
+  height: calc(100vh - $header_height);
 }
 
 nav {

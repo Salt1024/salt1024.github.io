@@ -11,6 +11,7 @@ export default defineConfig(() => {
     // base: mode === 'production' ? 'https://salt1024.github.io/' : '/',
     server: {
       host: '0.0.0.0',
+      allowedHosts: ['minnow-enough-mackerel.ngrok-free.app'],
       // proxy: {
       //   '/api': {
       //     target: 'https://127.0.0.1:11434',
@@ -29,11 +30,11 @@ export default defineConfig(() => {
         output: {
           sanitizeFileName: (name) => {
             return name
-              .replace(/\s+/g, '-') // Replaces spaces with dashes.
-              .replace(/[^a-zA-Z0-9_.-]/g, ''); // Removes all invalid characters.
+              .replace(/\s+/g, '-')
+              .replace(/[^a-zA-Z0-9_.-]/g, '')
           },
-        }
-      }
-    }
+        },
+      },
+    },
   }
 })

@@ -11,36 +11,6 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/views/Home.vue'),
     children: [
       {
-        path: 'chat',
-        name: 'Chat',
-        component: () => import('@/views/Chat.vue'),
-        meta: {
-          key: 'Chat',
-          label: 'Chat',
-          icon: ChatboxEllipsesOutline,
-        },
-      },
-      {
-        path: 'price',
-        name: 'Price',
-        component: () => import('@/views/Price.vue'),
-        meta: {
-          key: 'Price',
-          label: 'Price',
-          icon: WalletOutline,
-        },
-      },
-      {
-        path: 'model-viewer',
-        name: 'ModelViewer',
-        component: () => import('@/views/ModelViewer.vue'),
-        meta: {
-          key: 'ModelViewer',
-          label: 'Model Viewer',
-          icon: CubeOutline,
-        },
-      },
-      {
         path: 'file-manager',
         name: 'FileManager',
         component: () => import('@/views/FileManager.vue'),
@@ -50,6 +20,16 @@ export const routes: RouteRecordRaw[] = [
           icon: CubeOutline,
         },
       },
+      // {
+      //   path: 'model-viewer',
+      //   name: 'ModelViewer',
+      //   component: () => import('@/views/ModelViewer.vue'),
+      //   meta: {
+      //     key: 'ModelViewer',
+      //     label: 'Model Viewer',
+      //     icon: CubeOutline,
+      //   },
+      // },
     ],
   },
   {

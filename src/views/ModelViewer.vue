@@ -11,8 +11,8 @@ import {
   MeshBasicMaterial,
   Mesh,
 } from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { ArcballControls } from 'three/examples/jsm/controls/ArcballControls'
+import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js'
+import { ArcballControls } from 'three/addons/controls/ArcballControls.js'
 import { NButton } from 'naive-ui'
 import { $message } from '@/utils'
 
@@ -26,7 +26,7 @@ renderer.setSize(width, height)
 
 const loadProgress = ref(0)
 
-function loadModel (file: File = null) {
+function loadModel (): Promise<GLTF> {
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader()
     loader.load('/sea_keep_lonely_watcher/scene.gltf', function (gltf) {
@@ -55,7 +55,7 @@ async function initModel () {
 // let mixer: AnimationMixer
 // let prevT = 0
 
-function animate (t) {
+function animate (t: number) {
   // if (prevT === 0) {
   //   prevT = t
   // }
