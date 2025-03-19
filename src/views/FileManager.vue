@@ -77,7 +77,7 @@ onMounted(async () => {
       <NSpace align="center">
         <NButton text type="error" @click="removeFile(item)">删除</NButton>
         <NButton text type="primary" @click="readFile(item)">查看</NButton>
-        <NButton text type="primary" @click="downloadFile(item)">查看</NButton>
+        <NButton text type="primary" @click="downloadFile(item)">下载</NButton>
       </NSpace>
     </div>
   </div>
