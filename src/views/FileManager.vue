@@ -8,7 +8,7 @@ import { FileManager } from '@/utils'
 
 let fm: FileManager = new FileManager()
 const fileList = ref([])
-const { open, onChange } = useFileDialog()
+const { open, onChange, reset } = useFileDialog()
 
 onChange(async (files) => {
   const existFiles = await fm.save(files)
@@ -19,6 +19,7 @@ onChange(async (files) => {
     }
   }
   await refreshFileList()
+  reset()
 })
 
 function showExistFileTip (existFiles: Array<File>) {
