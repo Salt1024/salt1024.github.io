@@ -79,8 +79,7 @@ async function downloadFile (item: FileObject) {
     const fileHandle = await dirHandle.getFileHandle(item.name, { create: true })
     const stream = await fileHandle.createWritable()
     await stream.truncate(0)
-    await stream.write(await file.arrayBuffer())
-    await stream.close()
+    await file.stream().pipeTo(stream)
     $message.success('下载成功')
   } catch (e) {
     if (e.name === 'AbortError') {
@@ -113,11 +112,13 @@ onMounted(async () => {
   <div class="file-list">
     <div v-for="item of fileList" class="file-item">
       <div class="file-name">{{ item.name }}</div>
-      <NSpace align="center">
-        <span>{{ formatSize(item.size) }}</span>
-        <NButton text type="error" @click="removeFile(item.handle)">删除</NButton>
-        <NButton text type="primary" @click="downloadFile(item)">下载</NButton>
-      </NSpace>
+      <div class="file-size">{{ formatSize(item.size) }}</div>
+      <div class="control">
+        <NSpace align="center">
+          <NButton text type="error" @click="removeFile(item.handle)">删除</NButton>
+          <NButton text type="primary" @click="downloadFile(item)">下载</NButton>
+        </NSpace>
+      </div>
     </div>
   </div>
 
@@ -131,11 +132,16 @@ onMounted(async () => {
 .file-item {
   display: flex;
   align-items: center;
-  height: 48px;
   padding: 10px 12px;
 
   .file-name {
     flex: 1 1 auto;
+  }
+
+  .control {
+    flex: 0 0 90px;
+    display: flex;
+    justify-content: flex-end;
   }
 }
 </style>
