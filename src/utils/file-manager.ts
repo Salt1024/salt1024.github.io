@@ -32,7 +32,6 @@ export class FileManager {
         const stream = await handle.createWritable()
         await stream.truncate(0)
         await file.stream().pipeTo(stream)
-        await stream.close()
       }
     }
     return existFiles
