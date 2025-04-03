@@ -31,7 +31,7 @@ export class FileManager {
         const handle = await this.opfs.getFileHandle(file.name, { create: true })
         const stream = await handle.createWritable()
         await stream.truncate(0)
-        await stream.write(await file.arrayBuffer())
+        await file.stream().pipeTo(stream)
         await stream.close()
       }
     }
