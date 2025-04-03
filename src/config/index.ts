@@ -1,1 +1,0 @@
-export { themeOverrides } from './theme'

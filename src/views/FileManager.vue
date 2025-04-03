@@ -2,8 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useFileDialog } from '@vueuse/core'
 import { NButton, NSpace, NFloatButton } from 'naive-ui'
-import { $message, $dialog } from '@/utils'
-import { FileManager } from '@/utils'
+import { $message, $dialog, FileManager } from '@/utils'
 import type { FileObject } from '@/types'
 
 let fm: FileManager = new FileManager()
@@ -62,7 +61,36 @@ async function removeFile (handle: FileSystemFileHandle) {
 }
 
 async function downloadFile (item: FileObject) {
-  // todo
+  try {
+    const dirHandle = await window.showDirectoryPicker({
+      mode: 'readwrite',
+    })
+    const file = await item.handle.getFile()
+
+    const isExist = await fm.isExist(item.name, dirHandle)
+
+    if (isExist) {
+      const isOverride = await showExistFileTip([file])
+      if (!isOverride) {
+        return
+      }
+    }
+
+    const fileHandle = await dirHandle.getFileHandle(item.name, { create: true })
+    const stream = await fileHandle.createWritable()
+    await stream.truncate(0)
+    await stream.write(await file.arrayBuffer())
+    await stream.close()
+    $message.success('下载成功')
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      $message.info('已取消')
+    } else if (e.name === 'SecurityError') {
+      $message.warning('无访问权限')
+    } else {
+      $message.error(e.message)
+    }
+  }
 }
 
 function formatSize (size: number) {

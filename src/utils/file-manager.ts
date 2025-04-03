@@ -7,9 +7,9 @@ export class FileManager {
     this.opfs = await navigator.storage.getDirectory()
   }
 
-  async isExist (fileName: string) {
+  async isExist (fileName: string, opfs: FileSystemDirectoryHandle): Promise<boolean> {
     try {
-      const handle = await this.opfs.getFileHandle(fileName, { create: false })
+      const handle = await opfs.getFileHandle(fileName, { create: false })
       const nowFile = await handle.getFile()
       return nowFile.size > 0
     } catch (e: unknown) {
@@ -25,7 +25,7 @@ export class FileManager {
     const existFiles = []
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
-      if ((await this.isExist(file.name)) && !override) {
+      if ((await this.isExist(file.name, this.opfs)) && !override) {
         existFiles.push(file)
       } else {
         const handle = await this.opfs.getFileHandle(file.name, { create: true })

@@ -1,5 +1,4 @@
 import { createDiscreteApi } from 'naive-ui'
-import { themeOverrides } from '@/config'
 
 export const {
   message: $message,
@@ -8,9 +7,4 @@ export const {
   modal: $modal
 } = createDiscreteApi(
   ['message', 'dialog', 'notification', 'modal'],
-  {
-    configProviderProps: {
-      themeOverrides: themeOverrides,
-    },
-  },
 )
